@@ -2,14 +2,11 @@
 using Pulumi.Azure.AppInsights;
 using Pulumi.Azure.AppService;
 using Pulumi.Azure.AppService.Inputs;
-using Pulumi.Azure.Automation;
 using Pulumi.Azure.Core;
 using Pulumi.Azure.Sql;
 using Pulumi.Azure.Storage;
 using System;
 using System.Threading.Tasks;
-using Account = Pulumi.Azure.Automation.Account;
-using AccountArgs = Pulumi.Azure.Automation.AccountArgs;
 
 namespace PulumiIAC
 {
@@ -34,7 +31,12 @@ namespace PulumiIAC
                 }
             });
 
-            var storageAccount = GetStorageAccount(rgName, storageAccountName);
+            var storageAccount = new Account(storageAccountName, new AccountArgs
+            {
+                ResourceGroupName = rgName,
+                AccountReplicationType = "LRS",
+                AccountTier = "Standard"
+            });
 
             var container = GetContainer(storageAccountName, "Messages");
 
@@ -99,9 +101,6 @@ namespace PulumiIAC
                 },
             },
             });
-
-            this.Endpoint = app.DefaultSiteHostname;
-
         }
 
         static ResourceGroup CreateResourceGroup(string rgName, string locationName) => new ResourceGroup(rgName, new ResourceGroupArgs
@@ -116,9 +115,6 @@ namespace PulumiIAC
             StorageAccountName = storageAccountName,
             ContainerAccessType = "private",
         });
-        static Account GetStorageAccount(string resourceGroupName, string storageAccountName) => new Account(storageAccountName, new AccountArgs
-        {
-            ResourceGroupName = resourceGroupName
-        });
+
     }
 }
