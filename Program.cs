@@ -15,7 +15,10 @@ namespace PulumiIAC
         static async Task Main(string[] args)
         {
             Console.WriteLine("starting deployment");
+
             string rgName = "PulumiTest";
+            string storageAccountName = "sa";
+
             var resourceGroup = CreateResourceGroup(rgName, Locations.WestEurope);
 
             var plan = GetAppServicePlan("CoolApps", new PlanArgs 
@@ -27,8 +30,8 @@ namespace PulumiIAC
                     Size = "B1"
                 }
             });
-            var storageAccount = GetStorageAccount(rgName);
-            var container = GetContainer(storageAccount.Name, "Messages");
+            var storageAccount = GetStorageAccount(rgName, storageAccountName);
+            var container = GetContainer(storageAccountName, "Messages");
         }
 
         static ResourceGroup CreateResourceGroup(string rgName, string locationName) => new ResourceGroup(rgName, new ResourceGroupArgs
@@ -43,7 +46,7 @@ namespace PulumiIAC
             StorageAccountName = storageAccountName,
             ContainerAccessType = "private",
         });
-        static Account GetStorageAccount(string resourceGroupName) => new Account("sa", new AccountArgs
+        static Account GetStorageAccount(string resourceGroupName, string storageAccountName) => new Account(storageAccountName, new AccountArgs
         {
             ResourceGroupName = resourceGroupName
         });
